@@ -108,10 +108,16 @@ variable update_strategy {
   default     = "NONE"
 }
 
-variable rolling_update_policy {
-  description = "The rolling update policy when update_strategy is ROLLING_UPDATE"
-  type        = "list"
-  default     = []
+variable update_policy {
+  description = "The update policy for VM's in Managed Instance Groups"
+  type        = "map"
+  default     = {
+                  type = "OPPORTUNISTIC"
+                  minimal_action = "RESTART"
+                  max_surge_fixed = 2
+                  max_unavailable_fixed = 1
+                  min_ready_sec = 50
+                }
 }
 
 variable service_port {

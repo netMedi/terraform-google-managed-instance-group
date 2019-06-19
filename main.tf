@@ -80,9 +80,7 @@ resource "google_compute_instance_group_manager" "default" {
 
   zone = "${var.zone}"
 
-  update_strategy = "${var.update_strategy}"
-
-  rolling_update_policy = ["${var.rolling_update_policy}"]
+  update_policy = ["${var.update_policy}"]
 
   target_pools = ["${var.target_pools}"]
 
@@ -162,7 +160,7 @@ resource "google_compute_region_instance_group_manager" "default" {
 
   update_strategy = "${var.update_strategy}"
 
-  rolling_update_policy = ["${var.rolling_update_policy}"]
+  update_policy = ["${var.update_policy}"]
 
   distribution_policy_zones = ["${local.distribution_zones["${length(var.distribution_policy_zones) == 0 ? "default" : "user"}"]}"]
 
