@@ -78,8 +78,6 @@ resource "google_compute_instance_group_manager" "default" {
 
   base_instance_name = "${var.name}"
 
-  instance_template = "${google_compute_instance_template.default.self_link}"
-
   zone = "${var.zone}"
 
   update_strategy = "${var.update_strategy}"
@@ -110,6 +108,11 @@ resource "google_compute_instance_group_manager" "default" {
   provisioner "local-exec" {
     when    = "create"
     command = "${var.local_cmd_create}"
+  }
+
+  version {
+    name = "appserver"
+    instance_template  = "${google_compute_instance_template.default.self_link}"
   }
 }
 
