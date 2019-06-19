@@ -24,8 +24,8 @@ variable project {
   default     = ""
 }
 
-variable region {
-  description = "Region for cloud resources."
+variable location {
+  description = "Location for cloud resources."
   default     = "us-central1"
 }
 

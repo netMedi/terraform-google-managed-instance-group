@@ -22,7 +22,7 @@ resource "google_compute_instance_template" "default" {
 
   machine_type = "${var.machine_type}"
 
-  region = "${var.region}"
+  region = "${var.location}"
 
   tags = ["${concat(list("allow-ssh"), var.target_tags)}"]
 
@@ -132,7 +132,7 @@ resource "google_compute_autoscaler" "default" {
 
 data "google_compute_zones" "available" {
   project = "${var.project}"
-  region  = "${var.region}"
+  region  = "${var.location}"
 }
 
 locals {
@@ -155,7 +155,7 @@ resource "google_compute_region_instance_group_manager" "default" {
 
   instance_template = "${google_compute_instance_template.default.self_link}"
 
-  region = "${var.region}"
+  location = "${var.location}"
 
   update_strategy = "${var.update_strategy}"
 
@@ -198,7 +198,7 @@ resource "google_compute_region_instance_group_manager" "default" {
 resource "google_compute_region_autoscaler" "default" {
   count   = "${var.module_enabled && var.autoscaling && ! var.zonal ? 1 : 0}"
   name    = "${var.name}"
-  region  = "${var.region}"
+  location  = "${var.location}"
   project = "${var.project}"
   target  = "${google_compute_region_instance_group_manager.default.self_link}"
 
