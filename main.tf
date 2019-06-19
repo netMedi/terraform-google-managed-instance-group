@@ -22,7 +22,7 @@ resource "google_compute_instance_template" "default" {
 
   machine_type = "${var.machine_type}"
 
-  region = "${var.region}"
+  region = "${var.location}"
 
   tags = ["${concat(list("allow-ssh"), var.target_tags)}"]
 
@@ -32,7 +32,7 @@ resource "google_compute_instance_template" "default" {
     network            = "${var.subnetwork == "" ? var.network : ""}"
     subnetwork         = "${var.subnetwork}"
     access_config      = ["${var.access_config}"]
-    address            = "${var.network_ip}"
+    network_ip         = "${var.network_ip}"
     subnetwork_project = "${var.subnetwork_project == "" ? var.project : var.subnetwork_project}"
   }
 
@@ -78,13 +78,9 @@ resource "google_compute_instance_group_manager" "default" {
 
   base_instance_name = "${var.name}"
 
-  instance_template = "${google_compute_instance_template.default.self_link}"
-
   zone = "${var.zone}"
 
-  update_strategy = "${var.update_strategy}"
-
-  rolling_update_policy = ["${var.rolling_update_policy}"]
+  update_policy = ["${var.update_policy}"]
 
   target_pools = ["${var.target_pools}"]
 
@@ -111,6 +107,11 @@ resource "google_compute_instance_group_manager" "default" {
     when    = "create"
     command = "${var.local_cmd_create}"
   }
+
+  version {
+    name = "appserver"
+    instance_template  = "${google_compute_instance_template.default.self_link}"
+  }
 }
 
 resource "google_compute_autoscaler" "default" {
@@ -132,7 +133,7 @@ resource "google_compute_autoscaler" "default" {
 
 data "google_compute_zones" "available" {
   project = "${var.project}"
-  region  = "${var.region}"
+  region  = "${var.location}"
 }
 
 locals {
@@ -155,11 +156,11 @@ resource "google_compute_region_instance_group_manager" "default" {
 
   instance_template = "${google_compute_instance_template.default.self_link}"
 
-  region = "${var.region}"
+  location = "${var.location}"
 
   update_strategy = "${var.update_strategy}"
 
-  rolling_update_policy = ["${var.rolling_update_policy}"]
+  update_policy = ["${var.update_policy}"]
 
   distribution_policy_zones = ["${local.distribution_zones["${length(var.distribution_policy_zones) == 0 ? "default" : "user"}"]}"]
 
@@ -198,7 +199,7 @@ resource "google_compute_region_instance_group_manager" "default" {
 resource "google_compute_region_autoscaler" "default" {
   count   = "${var.module_enabled && var.autoscaling && ! var.zonal ? 1 : 0}"
   name    = "${var.name}"
-  region  = "${var.region}"
+  location  = "${var.location}"
   project = "${var.project}"
   target  = "${google_compute_region_instance_group_manager.default.self_link}"
 
